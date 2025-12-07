@@ -6,23 +6,24 @@ import LoginPage from '../../pages/LoginPage';
 import FavoritesPage from '../../pages/FavoritesPage';
 import OfferPage from '../../pages/OfferPage';
 import PrivateRoute from '../private-route/PrivateRoute';
+import { Offer } from '../../mocks/offers';
 
 /**
  * Main component, that is connected to index.tsx
  */
 
 interface AppProps {
-    cardsCount: number;
+    offers: Offer[];
 }
 
-function App({ cardsCount }: AppProps): JSX.Element {
+function App({ offers }: AppProps): JSX.Element {
   return (
     <BrowserRouter>
       <Routes>
         <Route
           path={AppRoute.Main}
           element = {
-            <MainPage cardsCount={cardsCount} />
+            <MainPage offers={offers} />
           }
         />
 
@@ -35,14 +36,14 @@ function App({ cardsCount }: AppProps): JSX.Element {
           path={AppRoute.Favorites}
           element = {
             <PrivateRoute authorizationStatus={AuthorizationStatus.NoAuth}>
-              <FavoritesPage/>
+              <FavoritesPage offers={offers} />
             </PrivateRoute>
           }
         />
 
         <Route
           path={AppRoute.Offer}
-          element = {<OfferPage/>}
+          element = {<OfferPage offers={offers} />}
         />
 
         <Route
