@@ -12,6 +12,10 @@ interface OfferPageProps {
 function OfferPage({ offers }: OfferPageProps): JSX.Element {
   const { id } = useParams<{ id: string }>();
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, [id]);
+
   const offer = offers.find((o) => o.id === id);
   if (!offer) {
     return (
@@ -22,15 +26,11 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
     );
   }
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
-  }, [id]);
-
   const ratingWidth = `${Math.round(offer.rating * 20)}%`;
 
   const nearOffers = offers
-  .filter((o) => o.city === offer.city && o.id !== offer.id)
-  .slice(0, 3);
+    .filter((o) => o.city === offer.city && o.id !== offer.id)
+    .slice(0, 3);
 
   return (
     <div className="page">
@@ -67,8 +67,8 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
         <section className="offer">
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
-              {offer.images.map((image, index) => (
-                <div key={index} className="offer__image-wrapper">
+              {offer.images.map((image) => (
+                <div key={image} className="offer__image-wrapper">
                   <img className="offer__image" src={image} alt="Photo studio" />
                 </div>
               ))}
@@ -117,8 +117,8 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
               <div className="offer__inside">
                 <h2 className="offer__inside-title">What&apos;s inside</h2>
                 <ul className="offer__inside-list">
-                  {offer.goods.map((good, index) => (
-                    <li key={index} className="offer__inside-item">
+                  {offer.goods.map((good) => (
+                    <li key={good} className="offer__inside-item">
                       {good}
                     </li>
                   ))}
