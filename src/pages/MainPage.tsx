@@ -3,29 +3,25 @@
  * которая отображает секции из макета main.html
  */
 
-import OfferCard, { cardProps } from '../components/OfferCard';
+import { Link } from 'react-router-dom';
+import { AppRoute } from '../const';
+import OffersList from '../components/OffersList';
+import { Offer } from '../mocks/offers';
 
 interface MainPageProps {
-  cardsCount: number;
+  offers: Offer[];
 }
 
-const defaultCard: cardProps = {
-  isPremium: true,
-  price: 800,
-  name: 'Default name',
-  type: 'Default type'
-};
-
-function MainPage({ cardsCount }: MainPageProps): JSX.Element {
+function MainPage({ offers }: MainPageProps): JSX.Element {
   return (
     <div className="page page--gray page--main">
       <header className="header">
         <div className="container">
           <div className="header__wrapper">
             <div className="header__left">
-              <a className="header__logo-link header__logo-link--active">
+              <Link className="header__logo-link header__logo-link--active" to={AppRoute.Main}>
                 <img className="header__logo" src="img/logo.svg" alt="6 cities logo" width="81" height="41" />
-              </a>
+              </Link>
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
@@ -106,42 +102,7 @@ function MainPage({ cardsCount }: MainPageProps): JSX.Element {
                   <li className="places__option" tabIndex={0}>Top rated first</li>
                 </ul>
               </form>
-              <div className="cities__places-list places__list tabs__content">
-                <OfferCard
-                  isPremium
-                  price={120}
-                  name='Beautiful luxurious apartment at great location'
-                  type='Apartment'
-                />
-                <OfferCard
-                  isPremium={false}
-                  price={80}
-                  name='Wood and stone place'
-                  type='Room'
-                />
-                <OfferCard
-                  isPremium={false}
-                  price={132}
-                  name='Canal View Prinsengracht'
-                  type='Apartment'
-                />
-                <OfferCard
-                  isPremium
-                  price={180}
-                  name='Nice, cozy, warm big bed apartment'
-                  type='Apartment'
-                />
-                <OfferCard
-                  isPremium={false}
-                  price={80}
-                  name='Wood and stone place'
-                  type='Room'
-                />
-
-                {Array.from({ length: cardsCount }, (_, idx) => (
-                  <OfferCard key={`offer-${idx}`} {...defaultCard} />
-                ))}
-              </div>
+              <OffersList offers={offers} />
             </section>
             <div className="cities__right-section">
               <section className="cities__map map"></section>
