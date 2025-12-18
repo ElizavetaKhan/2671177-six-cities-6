@@ -65,8 +65,8 @@ function OfferPage(): JSX.Element {
         <section className="offer">
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
-              {offer.images.map((image) => (
-                <div key={image} className="offer__image-wrapper">
+              {offer.images.map((image, index) => (
+                <div key={`${image}-${index}`} className="offer__image-wrapper">
                   <img className="offer__image" src={image} alt="Photo studio" />
                 </div>
               ))}
