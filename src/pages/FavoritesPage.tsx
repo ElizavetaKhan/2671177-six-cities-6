@@ -1,14 +1,13 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { AppRoute } from '../const';
 import { Offer } from '../mocks/offers';
 import FavoriteCard from '../components/FavoriteCard';
+import { RootState } from '../store';
 
-interface FavoritesPageProps {
-  offers: Offer[];
-}
-
-function FavoritesPage({ offers }: FavoritesPageProps): JSX.Element {
-  const favoriteOffers = offers.filter((offer) => offer.isFavorite);
+function FavoritesPage(): JSX.Element {
+  const allOffers = useSelector((state: RootState) => state.offers);
+  const favoriteOffers = allOffers.filter((offer) => offer.isFavorite);
 
   const groupedByCity = favoriteOffers.reduce((acc, offer) => {
     if (!acc[offer.city]) {

@@ -1,22 +1,20 @@
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { Offer } from '../mocks/offers';
+import { useSelector } from 'react-redux';
 import { AppRoute } from '../const';
 import { useEffect } from 'react';
 import ReviewForm from '../components/ReviewForm';
+import { RootState } from '../store';
 
-interface OfferPageProps {
-  offers: Offer[];
-}
-
-function OfferPage({ offers }: OfferPageProps): JSX.Element {
+function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const allOffers = useSelector((state: RootState) => state.offers);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }, [id]);
 
-  const offer = offers.find((o) => o.id === id);
+  const offer = allOffers.find((o) => o.id === id);
   if (!offer) {
     return (
       <div className="page">
@@ -28,7 +26,7 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
 
   const ratingWidth = `${Math.round(offer.rating * 20)}%`;
 
-  const nearOffers = offers
+  const nearOffers = allOffers
     .filter((o) => o.city === offer.city && o.id !== offer.id)
     .slice(0, 3);
 
@@ -68,7 +66,7 @@ function OfferPage({ offers }: OfferPageProps): JSX.Element {
           <div className="offer__gallery-container container">
             <div className="offer__gallery">
               {offer.images.map((image) => (
-                <div key={image} className="offer__image-wrapper">
+                <div key={`${image}-${offer.id}`} className="offer__image-wrapper">
                   <img className="offer__image" src={image} alt="Photo studio" />
                 </div>
               ))}
