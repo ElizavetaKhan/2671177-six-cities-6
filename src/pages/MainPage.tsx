@@ -31,11 +31,13 @@ function MainPage(): JSX.Element {
     ? {
       lat: filteredOffers[0].city.location.latitude,
       lng: filteredOffers[0].city.location.longitude,
+      zoom: filteredOffers[0].city.location.zoom,
     }
     : {
       // координаты по умолчанию
       lat: 52.38333,
       lng: 4.9,
+      zoom: 10,
     };
 
   const points: Points = filteredOffers.map((offer) => ({
@@ -94,11 +96,13 @@ function MainPage(): JSX.Element {
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
-              {offersDataError ? (
+              {offersDataError && (
                 <ErrorMessage message={offersDataError} />
-              ) : isOffersDataLoading ? (
+              )}
+              {!offersDataError && isOffersDataLoading && (
                 <Spinner />
-              ) : (
+              )}
+              {!offersDataError && !isOffersDataLoading && (
                 <>
                   <b className="places__found">
                     {filteredOffers.length} places to stay in {selectedCity}

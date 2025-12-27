@@ -18,11 +18,10 @@ export const fetchOffersAction = () =>
       const { data } = await api.get<Offer[]>('/offers');
       dispatch(loadOffers(data));
     } catch (error) {
-      const errorMessage = error instanceof Error 
-        ? error.message 
+      const errorMessage = error instanceof Error
+        ? error.message
         : 'Не удалось загрузить данные. Сервер недоступен.';
       dispatch(setOffersDataError(errorMessage));
-      console.error('Error fetching offers:', error);
     } finally {
       dispatch(setOffersDataLoading(false));
     }
