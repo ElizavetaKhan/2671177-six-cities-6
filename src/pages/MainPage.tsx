@@ -4,33 +4,40 @@
  */
 
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppRoute } from '../const';
 import OffersList from '../components/OffersList';
 import Map from '../components/Map';
+import Spinner from '../components/Spinner';
+import ErrorMessage from '../components/ErrorMessage';
 import { City, Points } from '../types/types';
-import { RootState } from '../store';
-import { changeCity } from '../store/action';
+import { RootState, AppDispatch } from '../store';
+import { changeCity, fetchOffersAction } from '../store/action';
 import CitiesList from '../components/CitiesList';
 
 const CITIES = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'];
 
 function MainPage(): JSX.Element {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const selectedCity = useSelector((state: RootState) => state.city);
   const allOffers = useSelector((state: RootState) => state.offers);
+  const isOffersDataLoading = useSelector((state: RootState) => state.isOffersDataLoading);
+  const offersDataError = useSelector((state: RootState) => state.offersDataError);
 
-  const filteredOffers = allOffers.filter((offer) => offer.city === selectedCity);
+  const filteredOffers = allOffers.filter((offer) => offer.city.name === selectedCity);
 
   const cityCoordinates: City = filteredOffers[0]
     ? {
-      lat: filteredOffers[0].location.latitude,
-      lng: filteredOffers[0].location.longitude,
+      lat: filteredOffers[0].city.location.latitude,
+      lng: filteredOffers[0].city.location.longitude,
+      zoom: filteredOffers[0].city.location.zoom,
     }
     : {
       // координаты по умолчанию
       lat: 52.38333,
       lng: 4.9,
+      zoom: 10,
     };
 
   const points: Points = filteredOffers.map((offer) => ({
@@ -38,6 +45,10 @@ function MainPage(): JSX.Element {
     lng: offer.location.longitude,
     title: offer.title,
   }));
+
+  useEffect(() => {
+    dispatch(fetchOffersAction());
+  }, [dispatch]);
 
   const handleCityChange = (city: string) => {
     dispatch(changeCity(city));
@@ -85,25 +96,35 @@ function MainPage(): JSX.Element {
           <div className="cities__places-container container">
             <section className="cities__places places">
               <h2 className="visually-hidden">Places</h2>
-              <b className="places__found">
-                {filteredOffers.length} places to stay in {selectedCity}
-              </b>
-              <form className="places__sorting" action="#" method="get">
-                <span className="places__sorting-caption">Sort by</span>
-                <span className="places__sorting-type" tabIndex={0}>
-                  Popular
-                  <svg className="places__sorting-arrow" width="7" height="4">
-                    <use href="#icon-arrow-select"></use>
-                  </svg>
-                </span>
-                <ul className="places__options places__options--custom places__options--opened">
-                  <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                  <li className="places__option" tabIndex={0}>Price: low to high</li>
-                  <li className="places__option" tabIndex={0}>Price: high to low</li>
-                  <li className="places__option" tabIndex={0}>Top rated first</li>
-                </ul>
-              </form>
-              <OffersList offers={filteredOffers} />
+              {offersDataError && (
+                <ErrorMessage message={offersDataError} />
+              )}
+              {!offersDataError && isOffersDataLoading && (
+                <Spinner />
+              )}
+              {!offersDataError && !isOffersDataLoading && (
+                <>
+                  <b className="places__found">
+                    {filteredOffers.length} places to stay in {selectedCity}
+                  </b>
+                  <form className="places__sorting" action="#" method="get">
+                    <span className="places__sorting-caption">Sort by</span>
+                    <span className="places__sorting-type" tabIndex={0}>
+                      Popular
+                      <svg className="places__sorting-arrow" width="7" height="4">
+                        <use href="#icon-arrow-select"></use>
+                      </svg>
+                    </span>
+                    <ul className="places__options places__options--custom places__options--opened">
+                      <li className="places__option places__option--active" tabIndex={0}>Popular</li>
+                      <li className="places__option" tabIndex={0}>Price: low to high</li>
+                      <li className="places__option" tabIndex={0}>Price: high to low</li>
+                      <li className="places__option" tabIndex={0}>Top rated first</li>
+                    </ul>
+                  </form>
+                  <OffersList offers={filteredOffers} />
+                </>
+              )}
             </section>
             <div className="cities__right-section">
               <Map
