@@ -1,6 +1,9 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
+import { AppDispatch } from '../store';
+import { requireAuthorization } from '../store/action';
+import { AuthorizationStatus } from '../const';
 
-const TOKEN_KEY = 'six-cities-token';
+export const TOKEN_KEY = 'six-cities-token';
 
 export function createAPI(): AxiosInstance {
   const api = axios.create({
@@ -17,5 +20,18 @@ export function createAPI(): AxiosInstance {
   });
 
   return api;
+}
+
+export function setupResponseInterceptor(api: AxiosInstance, dispatch: AppDispatch): void {
+  api.interceptors.response.use(
+    (response: AxiosResponse) => response,
+    (error: AxiosError) => {
+      if (error.response?.status === 401) {
+        dispatch(requireAuthorization(AuthorizationStatus.NoAuth));
+        localStorage.removeItem(TOKEN_KEY);
+      }
+      return Promise.reject(error);
+    }
+  );
 }
 
