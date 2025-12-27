@@ -2,19 +2,31 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { AppRoute } from '../const';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import ReviewForm from '../components/ReviewForm';
-import { RootState } from '../store';
+import { getAllOffers } from '../store/selectors';
 
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
-  const allOffers = useSelector((state: RootState) => state.offers);
+  const allOffers = useSelector(getAllOffers);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   }, [id]);
 
-  const offer = allOffers.find((o) => o.id === id);
+  const offer = useMemo(() => allOffers.find((o) => o.id === id), [allOffers, id]);
+
+  const ratingWidth = useMemo(() => offer ? `${Math.round(offer.rating * 20)}%` : '0%', [offer]);
+
+  const nearOffers = useMemo(() => {
+    if (!offer) {
+      return [];
+    }
+    return allOffers
+      .filter((o) => o.city.name === offer.city.name && o.id !== offer.id)
+      .slice(0, 3);
+  }, [allOffers, offer]);
+
   if (!offer) {
     return (
       <div className="page">
@@ -23,12 +35,6 @@ function OfferPage(): JSX.Element {
       </div>
     );
   }
-
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
-
-  const nearOffers = allOffers
-    .filter((o) => o.city.name === offer.city.name && o.id !== offer.id)
-    .slice(0, 3);
 
   return (
     <div className="page">

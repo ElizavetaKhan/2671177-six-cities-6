@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Offer } from '../types/offer';
 import { Link } from 'react-router-dom';
 
@@ -7,8 +8,8 @@ export type cardProps = {
   onMouseLeave?: () => void;
 }
 
-function OfferCard({ offer, onMouseEnter, onMouseLeave }: cardProps): JSX.Element {
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
+function OfferCardComponent({ offer, onMouseEnter, onMouseLeave }: cardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
 
   return (
     <article className="cities__card place-card"
@@ -53,4 +54,5 @@ function OfferCard({ offer, onMouseEnter, onMouseLeave }: cardProps): JSX.Elemen
   );
 }
 
+const OfferCard = memo(OfferCardComponent);
 export default OfferCard;

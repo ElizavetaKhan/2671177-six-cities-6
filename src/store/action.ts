@@ -59,3 +59,8 @@ export const loginAction = (email: string, password: string) =>
   };
 
 export const logout = createAction('user/logout');
+
+export const logoutAction = () => (dispatch: AppDispatch) => {
+  localStorage.removeItem(TOKEN_KEY);
+  dispatch(logout());
+};

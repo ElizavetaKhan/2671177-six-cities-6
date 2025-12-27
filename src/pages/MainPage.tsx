@@ -4,7 +4,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppRoute } from '../const';
 import OffersList from '../components/OffersList';
@@ -12,54 +12,62 @@ import Map from '../components/Map';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
 import { City, Points } from '../types/types';
-import { RootState, AppDispatch } from '../store';
-import { changeCity, fetchOffersAction, logout } from '../store/action';
+import { Offer } from '../types/offer';
+import { AppDispatch } from '../store';
+import { changeCity, fetchOffersAction, logoutAction } from '../store/action';
 import { AuthorizationStatus } from '../const';
 import CitiesList from '../components/CitiesList';
+import {
+  getSelectedCity,
+  getFilteredOffers,
+  getOffersLoadingStatus,
+  getOffersError,
+  getAuthorizationStatus,
+  getUser,
+  getFavoriteOffersCount,
+} from '../store/selectors';
 
 const CITIES = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'];
 
 function MainPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
-  const selectedCity = useSelector((state: RootState) => state.city);
-  const allOffers = useSelector((state: RootState) => state.offers);
-  const isOffersDataLoading = useSelector((state: RootState) => state.isOffersDataLoading);
-  const offersDataError = useSelector((state: RootState) => state.offersDataError);
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
-  const user = useSelector((state: RootState) => state.user);
+  const selectedCity = useSelector(getSelectedCity);
+  const filteredOffers = useSelector(getFilteredOffers);
+  const isOffersDataLoading = useSelector(getOffersLoadingStatus);
+  const offersDataError = useSelector(getOffersError);
+  const authorizationStatus = useSelector(getAuthorizationStatus);
+  const user = useSelector(getUser);
+  const favoriteOffersCount = useSelector(getFavoriteOffersCount);
 
-  const filteredOffers = allOffers.filter((offer) => offer.city.name === selectedCity);
-
-  const cityCoordinates: City = filteredOffers[0]
+  const cityCoordinates: City = useMemo(() => filteredOffers[0]
     ? {
       lat: filteredOffers[0].city.location.latitude,
       lng: filteredOffers[0].city.location.longitude,
       zoom: filteredOffers[0].city.location.zoom,
     }
     : {
-      // координаты по умолчанию
       lat: 52.38333,
       lng: 4.9,
       zoom: 10,
-    };
+    }, [filteredOffers]);
 
-  const points: Points = filteredOffers.map((offer) => ({
+  const points: Points = useMemo(() => filteredOffers.map((offer: Offer) => ({
     lat: offer.location.latitude,
     lng: offer.location.longitude,
     title: offer.title,
-  }));
+  })), [filteredOffers]);
 
   useEffect(() => {
     dispatch(fetchOffersAction());
   }, [dispatch]);
 
-  const handleCityChange = (city: string) => {
+  const handleCityChange = useCallback((city: string) => {
     dispatch(changeCity(city));
-  };
+  }, [dispatch]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  const handleLogout = useCallback(() => {
+    dispatch(logoutAction());
+  }, [dispatch]);
 
   return (
     <div className="page page--gray page--main">
@@ -81,7 +89,7 @@ function MainPage(): JSX.Element {
                           <img className="header__avatar user__avatar" src={user.avatarUrl} alt={user.name} width="20" height="20" />
                         </div>
                         <span className="header__user-name user__name">{user.email}</span>
-                        <span className="header__favorite-count">{allOffers.filter((offer) => offer.isFavorite).length}</span>
+                        <span className="header__favorite-count">{favoriteOffersCount}</span>
                       </Link>
                     </li>
                     <li className="header__nav-item">
