@@ -82,7 +82,10 @@ function LoginPage(): JSX.Element {
         <div className="page__login-container container">
           <section className="login">
             <h1 className="login__title">Sign in</h1>
-            <form className="login__form form" action="#" method="post" onSubmit={handleSubmit}>
+            <form className="login__form form" action="#" method="post" onSubmit={(e) => {
+              void handleSubmit(e);
+            }}
+            >
               {error && (
                 <div style={{ color: '#ff6b6b', marginBottom: '10px', fontSize: '14px' }}>
                   {error}

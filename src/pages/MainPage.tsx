@@ -85,7 +85,10 @@ function MainPage(): JSX.Element {
                       </Link>
                     </li>
                     <li className="header__nav-item">
-                      <a className="header__nav-link" href="#" onClick={(e) => { e.preventDefault(); handleLogout(); }}>
+                      <a className="header__nav-link" href="#" onClick={(e) => {
+                        e.preventDefault(); handleLogout();
+                      }}
+                      >
                         <span className="header__signout">Sign out</span>
                       </a>
                     </li>
