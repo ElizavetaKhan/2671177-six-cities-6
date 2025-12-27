@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Offer } from '../types/offer';
 import { Link } from 'react-router-dom';
 
@@ -5,8 +6,8 @@ interface FavoriteCardProps {
   offer: Offer;
 }
 
-function FavoriteCard({ offer }: FavoriteCardProps): JSX.Element {
-  const ratingWidth = `${Math.round(offer.rating * 20)}%`;
+function FavoriteCardComponent({ offer }: FavoriteCardProps): JSX.Element {
+  const ratingWidth = useMemo(() => `${Math.round(offer.rating * 20)}%`, [offer.rating]);
 
   return (
     <article className="favorites__card place-card">
@@ -48,4 +49,5 @@ function FavoriteCard({ offer }: FavoriteCardProps): JSX.Element {
   );
 }
 
+const FavoriteCard = memo(FavoriteCardComponent);
 export default FavoriteCard;

@@ -1,10 +1,12 @@
+import { memo } from 'react';
+
 interface CitiesListProps {
     cities: string[];
     selectedCity: string;
     onCityChange: (city: string) => void;
   }
 
-function CitiesList({ cities, selectedCity, onCityChange }: CitiesListProps): JSX.Element {
+function CitiesListComponent({ cities, selectedCity, onCityChange }: CitiesListProps): JSX.Element {
   return (
     <div className="tabs">
       <section className="locations container">
@@ -31,4 +33,5 @@ function CitiesList({ cities, selectedCity, onCityChange }: CitiesListProps): JS
   );
 }
 
+const CitiesList = memo(CitiesListComponent);
 export default CitiesList;
