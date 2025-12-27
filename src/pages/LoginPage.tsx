@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { AppRoute } from '../const';
-import { AppDispatch, RootState } from '../store';
+import { AppDispatch } from '../store';
 import { loginAction } from '../store/action';
 import { AuthorizationStatus } from '../const';
+import { getAuthorizationStatus } from '../store/selectors';
 
 function LoginPage(): JSX.Element {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const authorizationStatus = useSelector((state: RootState) => state.authorizationStatus);
+  const authorizationStatus = useSelector(getAuthorizationStatus);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
