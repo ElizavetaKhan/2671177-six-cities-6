@@ -16,10 +16,11 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
-    expect(screen.getByLabelText('perfect').closest('input')).toBeChecked();
+    const fiveStarInput = document.getElementById('5-stars') as HTMLInputElement;
+    expect(fiveStarInput).toBeChecked();
   });
 
   it('should change comment text when typing', async () => {
@@ -43,8 +44,8 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'Short comment');
@@ -57,8 +58,8 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'This is a very long comment that exceeds the minimum length requirement of 50 characters');
@@ -71,8 +72,8 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'This is a very long comment that exceeds the minimum length requirement of 50 characters');
@@ -81,15 +82,16 @@ describe('ReviewForm component', () => {
     await user.click(submitButton);
 
     expect(textarea).toHaveValue('');
-    expect(screen.getByLabelText('perfect').closest('input')).not.toBeChecked();
+    const fiveStarInput = document.getElementById('5-stars') as HTMLInputElement;
+    expect(fiveStarInput).not.toBeChecked();
   });
 
   it('should call handleSubmit when form is submitted', async () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'This is a very long comment that exceeds the minimum length requirement of 50 characters');
@@ -104,22 +106,24 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const threeStarInput = screen.getByLabelText('not bad');
-    await user.click(threeStarInput);
-    expect(threeStarInput.closest('input')).toBeChecked();
+    const threeStarLabel = screen.getByTitle('not bad');
+    await user.click(threeStarLabel);
+    const threeStarInput = document.getElementById('3-stars') as HTMLInputElement;
+    expect(threeStarInput).toBeChecked();
 
-    const oneStarInput = screen.getByLabelText('terribly');
-    await user.click(oneStarInput);
-    expect(oneStarInput.closest('input')).toBeChecked();
-    expect(threeStarInput.closest('input')).not.toBeChecked();
+    const oneStarLabel = screen.getByTitle('terribly');
+    await user.click(oneStarLabel);
+    const oneStarInput = document.getElementById('1-star') as HTMLInputElement;
+    expect(oneStarInput).toBeChecked();
+    expect(threeStarInput).not.toBeChecked();
   });
 
   it('should disable submit button when rating is selected but comment is too short', async () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fourStarInput = screen.getByLabelText('good');
-    await user.click(fourStarInput);
+    const fourStarLabel = screen.getByTitle('good');
+    await user.click(fourStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'Short');
@@ -132,8 +136,8 @@ describe('ReviewForm component', () => {
     const user = userEvent.setup();
     render(<ReviewForm />);
 
-    const fiveStarInput = screen.getByLabelText('perfect');
-    await user.click(fiveStarInput);
+    const fiveStarLabel = screen.getByTitle('perfect');
+    await user.click(fiveStarLabel);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     const exactly50Chars = 'a'.repeat(50);
