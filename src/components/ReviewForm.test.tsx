@@ -1,11 +1,40 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
+import { configureStore } from '@reduxjs/toolkit';
 import ReviewForm from './ReviewForm';
+import rootReducer from '../store/reducer';
+import { AuthorizationStatus } from '../const';
+
+const createMockStore = () => configureStore({
+  reducer: rootReducer,
+  preloadedState: {
+    user: {
+      authorizationStatus: AuthorizationStatus.Auth,
+      user: {
+        email: 'test@example.com',
+        token: 'token',
+        name: 'Test User',
+        avatarUrl: 'avatar.jpg',
+        isPro: false,
+      },
+    },
+  },
+});
+
+const renderWithProviders = (component: JSX.Element) => render(
+  <Provider store={createMockStore()}>
+    <MemoryRouter initialEntries={['/offer/test-id']}>
+      {component}
+    </MemoryRouter>
+  </Provider>
+);
 
 describe('ReviewForm component', () => {
   it('should render form with rating and comment fields', () => {
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     expect(screen.getByLabelText('Your review')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved')).toBeInTheDocument();
@@ -14,7 +43,7 @@ describe('ReviewForm component', () => {
 
   it('should change rating when selecting a star', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
@@ -25,7 +54,7 @@ describe('ReviewForm component', () => {
 
   it('should change comment text when typing', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const textarea = screen.getByPlaceholderText('Tell how was your stay, what you like and what can be improved');
     await user.type(textarea, 'This is a test comment');
@@ -34,7 +63,7 @@ describe('ReviewForm component', () => {
   });
 
   it('should disable submit button when rating is 0', () => {
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const submitButton = screen.getByRole('button', { name: 'Submit' });
     expect(submitButton).toBeDisabled();
@@ -42,7 +71,7 @@ describe('ReviewForm component', () => {
 
   it('should disable submit button when comment length is less than 50', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
@@ -56,7 +85,7 @@ describe('ReviewForm component', () => {
 
   it('should enable submit button when rating > 0 and comment.length >= 50', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
@@ -70,7 +99,7 @@ describe('ReviewForm component', () => {
 
   it('should clear form after submit', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
@@ -88,7 +117,7 @@ describe('ReviewForm component', () => {
 
   it('should call handleSubmit when form is submitted', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
@@ -104,7 +133,7 @@ describe('ReviewForm component', () => {
 
   it('should allow selecting different star ratings', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const threeStarLabel = screen.getByTitle('not bad');
     await user.click(threeStarLabel);
@@ -120,7 +149,7 @@ describe('ReviewForm component', () => {
 
   it('should disable submit button when rating is selected but comment is too short', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fourStarLabel = screen.getByTitle('good');
     await user.click(fourStarLabel);
@@ -134,7 +163,7 @@ describe('ReviewForm component', () => {
 
   it('should enable submit button exactly at 50 characters', async () => {
     const user = userEvent.setup();
-    render(<ReviewForm />);
+    renderWithProviders(<ReviewForm />);
 
     const fiveStarLabel = screen.getByTitle('perfect');
     await user.click(fiveStarLabel);
