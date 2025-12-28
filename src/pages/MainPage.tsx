@@ -3,7 +3,7 @@
  * которая отображает секции из макета main.html
  */
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppRoute } from '../const';
@@ -11,10 +11,11 @@ import OffersList from '../components/OffersList';
 import Map from '../components/Map';
 import Spinner from '../components/Spinner';
 import ErrorMessage from '../components/ErrorMessage';
+import EmptyMainContent from '../components/EmptyMainContent';
 import { City, Points } from '../types/types';
 import { Offer } from '../types/offer';
 import { AppDispatch } from '../store';
-import { changeCity, fetchOffersAction, logoutAction } from '../store/action';
+import { changeCity, fetchOffersAction, logoutAction, toggleFavoriteAction } from '../store/action';
 import { AuthorizationStatus } from '../const';
 import CitiesList from '../components/CitiesList';
 import {
@@ -31,6 +32,7 @@ const CITIES = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseld
 
 function MainPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const selectedCity = useSelector(getSelectedCity);
   const filteredOffers = useSelector(getFilteredOffers);
   const isOffersDataLoading = useSelector(getOffersLoadingStatus);
@@ -68,6 +70,18 @@ function MainPage(): JSX.Element {
   const handleLogout = useCallback(() => {
     dispatch(logoutAction());
   }, [dispatch]);
+
+  const handleFavoriteClick = useCallback((offerId: string) => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate(AppRoute.Login);
+      return;
+    }
+
+    const offer = filteredOffers.find((o) => o.id === offerId);
+    if (offer) {
+      dispatch(toggleFavoriteAction(offerId, !offer.isFavorite));
+    }
+  }, [dispatch, navigate, authorizationStatus, filteredOffers]);
 
   return (
     <div className="page page--gray page--main">
@@ -122,46 +136,52 @@ function MainPage(): JSX.Element {
           onCityChange={handleCityChange}
         />
         <div className="cities">
-          <div className="cities__places-container container">
-            <section className="cities__places places">
-              <h2 className="visually-hidden">Places</h2>
-              {offersDataError && (
-                <ErrorMessage message={offersDataError} />
-              )}
-              {!offersDataError && isOffersDataLoading && (
-                <Spinner />
-              )}
-              {!offersDataError && !isOffersDataLoading && (
-                <>
-                  <b className="places__found">
-                    {filteredOffers.length} places to stay in {selectedCity}
-                  </b>
-                  <form className="places__sorting" action="#" method="get">
-                    <span className="places__sorting-caption">Sort by</span>
-                    <span className="places__sorting-type" tabIndex={0}>
-                      Popular
-                      <svg className="places__sorting-arrow" width="7" height="4">
-                        <use href="#icon-arrow-select"></use>
-                      </svg>
-                    </span>
-                    <ul className="places__options places__options--custom places__options--opened">
-                      <li className="places__option places__option--active" tabIndex={0}>Popular</li>
-                      <li className="places__option" tabIndex={0}>Price: low to high</li>
-                      <li className="places__option" tabIndex={0}>Price: high to low</li>
-                      <li className="places__option" tabIndex={0}>Top rated first</li>
-                    </ul>
-                  </form>
-                  <OffersList offers={filteredOffers} />
-                </>
-              )}
-            </section>
-            <div className="cities__right-section">
-              <Map
-                city={cityCoordinates}
-                points={points}
-                selectedPoint={undefined}
-              />
-            </div>
+          <div className={`cities__places-container ${!offersDataError && !isOffersDataLoading && filteredOffers.length === 0 ? 'cities__places-container--empty' : ''} container`}>
+            {!offersDataError && !isOffersDataLoading && filteredOffers.length === 0 ? (
+              <EmptyMainContent city={selectedCity} />
+            ) : (
+              <section className="cities__places places">
+                <h2 className="visually-hidden">Places</h2>
+                {offersDataError && (
+                  <ErrorMessage message={offersDataError} />
+                )}
+                {!offersDataError && isOffersDataLoading && (
+                  <Spinner />
+                )}
+                {!offersDataError && !isOffersDataLoading && (
+                  <>
+                    <b className="places__found">
+                      {filteredOffers.length} places to stay in {selectedCity}
+                    </b>
+                    <form className="places__sorting" action="#" method="get">
+                      <span className="places__sorting-caption">Sort by</span>
+                      <span className="places__sorting-type" tabIndex={0}>
+                        Popular
+                        <svg className="places__sorting-arrow" width="7" height="4">
+                          <use href="#icon-arrow-select"></use>
+                        </svg>
+                      </span>
+                      <ul className="places__options places__options--custom places__options--opened">
+                        <li className="places__option places__option--active" tabIndex={0}>Popular</li>
+                        <li className="places__option" tabIndex={0}>Price: low to high</li>
+                        <li className="places__option" tabIndex={0}>Price: high to low</li>
+                        <li className="places__option" tabIndex={0}>Top rated first</li>
+                      </ul>
+                    </form>
+                    <OffersList offers={filteredOffers} onFavoriteClick={handleFavoriteClick} />
+                  </>
+                )}
+              </section>
+            )}
+            {(!offersDataError && !isOffersDataLoading && filteredOffers.length > 0) && (
+              <div className="cities__right-section">
+                <Map
+                  city={cityCoordinates}
+                  points={points}
+                  selectedPoint={undefined}
+                />
+              </div>
+            )}
           </div>
         </div>
       </main>
