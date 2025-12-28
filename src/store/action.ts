@@ -13,6 +13,9 @@ export const loadOffers = createAction<Offer[]>('app/loadOffers');
 export const setOffersDataLoading = createAction<boolean>('app/setOffersDataLoading');
 export const setOffersDataError = createAction<string | null>('app/setOffersDataError');
 
+export const updateOfferFavorite = createAction<{ id: string; isFavorite: boolean }>('offers/updateOfferFavorite');
+export const updateOffer = createAction<Offer>('offers/updateOffer');
+
 export const requireAuthorization = createAction<AuthorizationStatus>('user/requireAuthorization');
 export const setUser = createAction<User | null>('user/setUser');
 
@@ -64,3 +67,28 @@ export const logoutAction = () => (dispatch: AppDispatch) => {
   localStorage.removeItem(TOKEN_KEY);
   dispatch(logout());
 };
+
+export const toggleFavoriteAction = (offerId: string, isFavorite: boolean) =>
+  async (dispatch: AppDispatch, _getState: () => RootState, api: AxiosInstance) => {
+    const { data } = await api.post<Offer>(`/favorite/${offerId}/${isFavorite ? 1 : 0}`);
+    dispatch(updateOffer(data));
+  };
+
+export const fetchFavoriteOffersAction = () =>
+  async (dispatch: AppDispatch, _getState: () => RootState, api: AxiosInstance) => {
+    const { data } = await api.get<Offer[]>('/favorite');
+    const currentOffers = _getState().offers.offers;
+    const updatedOffers = [...currentOffers];
+
+    data.forEach((favoriteOffer) => {
+      const updatedOffer = { ...favoriteOffer, isFavorite: true };
+      const index = updatedOffers.findIndex((o) => o.id === favoriteOffer.id);
+      if (index !== -1) {
+        updatedOffers[index] = updatedOffer;
+      } else {
+        updatedOffers.push(updatedOffer);
+      }
+    });
+
+    dispatch(loadOffers(updatedOffers));
+  };
