@@ -4,9 +4,10 @@ import { Offer } from '../types/offer';
 
 interface OffersListProps {
   offers: Offer[];
+  onFavoriteClick?: (offerId: string) => void;
 }
 
-function OffersList({ offers }: OffersListProps): JSX.Element {
+function OffersList({ offers, onFavoriteClick }: OffersListProps): JSX.Element {
   const handleMouseEnter = useCallback(() => {
     // activeCard будет использоваться для выделения точки на карте
   }, []);
@@ -23,6 +24,7 @@ function OffersList({ offers }: OffersListProps): JSX.Element {
           offer={offer}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
+          onFavoriteClick={onFavoriteClick}
         />
       ))}
     </div>
