@@ -1,14 +1,21 @@
 import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { AppRoute } from '../const';
-import { useEffect, useMemo } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { AppRoute, AuthorizationStatus } from '../const';
+import { useEffect, useMemo, useCallback } from 'react';
 import ReviewForm from '../components/ReviewForm';
-import { getAllOffers } from '../store/selectors';
+import { getAllOffers, getAuthorizationStatus, getUser, getFavoriteOffersCount } from '../store/selectors';
+import { AppDispatch } from '../store';
+import { toggleFavoriteAction, logoutAction } from '../store/action';
 
 function OfferPage(): JSX.Element {
   const { id } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const allOffers = useSelector(getAllOffers);
+  const authorizationStatus = useSelector(getAuthorizationStatus);
+  const user = useSelector(getUser);
+  const favoriteOffersCount = useSelector(getFavoriteOffersCount);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
@@ -26,6 +33,22 @@ function OfferPage(): JSX.Element {
       .filter((o) => o.city.name === offer.city.name && o.id !== offer.id)
       .slice(0, 3);
   }, [allOffers, offer]);
+
+  const handleFavoriteClick = useCallback((offerId: string) => {
+    if (authorizationStatus !== AuthorizationStatus.Auth) {
+      navigate(AppRoute.Login);
+      return;
+    }
+
+    const targetOffer = allOffers.find((o) => o.id === offerId);
+    if (targetOffer) {
+      dispatch(toggleFavoriteAction(offerId, !targetOffer.isFavorite));
+    }
+  }, [dispatch, navigate, authorizationStatus, allOffers]);
+
+  const handleLogout = useCallback(() => {
+    dispatch(logoutAction());
+  }, [dispatch]);
 
   if (!offer) {
     return (
@@ -48,19 +71,33 @@ function OfferPage(): JSX.Element {
             </div>
             <nav className="header__nav">
               <ul className="header__nav-list">
-                <li className="header__nav-item user">
-                  <a className="header__nav-link header__nav-link--profile" href="#">
-                    <div className="header__avatar-wrapper user__avatar-wrapper">
-                    </div>
-                    <span className="header__user-name user__name">Oliver.conner@gmail.com</span>
-                    <span className="header__favorite-count">3</span>
-                  </a>
-                </li>
-                <li className="header__nav-item">
-                  <a className="header__nav-link" href="#">
-                    <span className="header__signout">Sign out</span>
-                  </a>
-                </li>
+                {authorizationStatus === AuthorizationStatus.Auth && user ? (
+                  <>
+                    <li className="header__nav-item user">
+                      <Link className="header__nav-link header__nav-link--profile" to={AppRoute.Favorites}>
+                        <div className="header__avatar-wrapper user__avatar-wrapper">
+                          <img className="header__avatar user__avatar" src={user.avatarUrl} alt={user.name} width="20" height="20" />
+                        </div>
+                        <span className="header__user-name user__name">{user.email}</span>
+                        <span className="header__favorite-count">{favoriteOffersCount}</span>
+                      </Link>
+                    </li>
+                    <li className="header__nav-item">
+                      <a className="header__nav-link" href="#" onClick={(e) => {
+                        e.preventDefault(); handleLogout();
+                      }}
+                      >
+                        <span className="header__signout">Sign out</span>
+                      </a>
+                    </li>
+                  </>
+                ) : (
+                  <li className="header__nav-item">
+                    <Link className="header__nav-link" to={AppRoute.Login}>
+                      <span className="header__login">Sign in</span>
+                    </Link>
+                  </li>
+                )}
               </ul>
             </nav>
           </div>
@@ -89,7 +126,14 @@ function OfferPage(): JSX.Element {
                 <h1 className="offer__name">
                   {offer.title}
                 </h1>
-                <button className={`offer__bookmark-button button ${offer.isFavorite ? 'place-card__bookmark-button--active' : ''}`} type="button">
+                <button
+                  className={`offer__bookmark-button button ${offer.isFavorite ? 'place-card__bookmark-button--active' : ''}`}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleFavoriteClick(offer.id);
+                  }}
+                >
                   <svg className="offer__bookmark-icon" width="31" height="33">
                     <use href="#icon-bookmark"></use>
                   </svg>
@@ -209,7 +253,14 @@ function OfferPage(): JSX.Element {
                           <b className="place-card__price-value">&euro;{nearOffer.price}</b>
                           <span className="place-card__price-text">&#47;&nbsp;night</span>
                         </div>
-                        <button className={`place-card__bookmark-button button ${nearOffer.isFavorite ? 'place-card__bookmark-button--active' : ''}`} type="button">
+                        <button
+                          className={`place-card__bookmark-button button ${nearOffer.isFavorite ? 'place-card__bookmark-button--active' : ''}`}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleFavoriteClick(nearOffer.id);
+                          }}
+                        >
                           <svg className="place-card__bookmark-icon" width="18" height="19">
                             <use href="#icon-bookmark"></use>
                           </svg>
