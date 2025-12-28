@@ -21,8 +21,9 @@ function FavoritesPage(): JSX.Element {
     const loadFavorites = async () => {
       setIsLoading(true);
       try {
-        await dispatch(fetchFavoriteOffersAction() as any);
-      } catch (error) {
+        await dispatch(fetchFavoriteOffersAction());
+      } catch {
+        // Ошибка загрузки избранных обрабатывается автоматически Redux
       } finally {
         setIsLoading(false);
       }
@@ -111,9 +112,8 @@ function FavoritesPage(): JSX.Element {
 
       <main className={`page__main page__main--favorites ${!hasFavorites && !isLoading ? 'page__main--favorites-empty' : ''}`}>
         <div className="page__favorites-container container">
-          {isLoading ? (
-            <Spinner />
-          ) : hasFavorites ? (
+          {isLoading && <Spinner />}
+          {!isLoading && hasFavorites && (
             <section className="favorites">
               <h1 className="favorites__title">Saved listing</h1>
               <ul className="favorites__list">
@@ -135,7 +135,8 @@ function FavoritesPage(): JSX.Element {
                 ))}
               </ul>
             </section>
-          ) : (
+          )}
+          {!isLoading && !hasFavorites && (
             <section className="favorites favorites--empty">
               <h1 className="visually-hidden">Favorites (empty)</h1>
               <div className="favorites__status-wrapper">
