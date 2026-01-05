@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import MainPage from '../../pages/MainPage';
-import ErrorPage from '../../pages/ErrorPage';
+import MainPage from '../../pages/main-page';
+import ErrorPage from '../../pages/error-page';
 import { AppRoute } from '../../const';
-import LoginPage from '../../pages/LoginPage';
-import FavoritesPage from '../../pages/FavoritesPage';
-import OfferPage from '../../pages/OfferPage';
-import PrivateRoute from '../private-route/PrivateRoute';
+import LoginPage from '../../pages/login-page';
+import FavoritesPage from '../../pages/favorites-page';
+import OfferPage from '../../pages/offer-page';
+import PrivateRoute from '../private-route/private-route';
 
 /**
  * Main component, that is connected to index.tsx

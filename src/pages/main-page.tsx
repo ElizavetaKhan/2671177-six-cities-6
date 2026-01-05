@@ -7,17 +7,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useCallback, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { AppRoute } from '../const';
-import OffersList from '../components/OffersList';
-import Map from '../components/Map';
-import Spinner from '../components/Spinner';
-import ErrorMessage from '../components/ErrorMessage';
-import EmptyMainContent from '../components/EmptyMainContent';
+import OffersList from '../components/offers-list';
+import Map from '../components/map';
+import Spinner from '../components/spinner';
+import ErrorMessage from '../components/error-message';
+import EmptyMainContent from '../components/empty-main-content';
 import { City, Points, Point } from '../types/types';
 import { Offer } from '../types/offer';
 import { AppDispatch } from '../store';
 import { changeCity, fetchOffersAction, logoutAction, toggleFavoriteAction } from '../store/action';
 import { AuthorizationStatus } from '../const';
-import CitiesList from '../components/CitiesList';
+import CitiesList from '../components/cities-list';
 import {
   getSelectedCity,
   getFilteredOffers,

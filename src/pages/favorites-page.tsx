@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { AppRoute, AuthorizationStatus } from '../const';
 import { Offer } from '../types/offer';
-import FavoriteCard from '../components/FavoriteCard';
+import FavoriteCard from '../components/favorite-card';
 import { getAllOffers, getAuthorizationStatus, getUser, getFavoriteOffersCount } from '../store/selectors';
 import { AppDispatch } from '../store';
 import { fetchFavoriteOffersAction, logoutAction, toggleFavoriteAction } from '../store/action';
-import Spinner from '../components/Spinner';
+import Spinner from '../components/spinner';
 
 function FavoritesPage(): JSX.Element {
   const dispatch = useDispatch<AppDispatch>();
