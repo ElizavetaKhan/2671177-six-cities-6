@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import EmptyMainContent from './EmptyMainContent';
+import EmptyMainContent from './empty-main-content';
 
 describe('EmptyMainContent component', () => {
   it('should render component with city prop', () => {

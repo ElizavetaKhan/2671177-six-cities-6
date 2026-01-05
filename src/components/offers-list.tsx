@@ -1,4 +1,4 @@
-import OfferCard from './OfferCard';
+import OfferCard from './offer-card';
 import { Offer } from '../types/offer';
 
 interface OffersListProps {

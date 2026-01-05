@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CitiesList from './CitiesList';
+import CitiesList from './cities-list';
 
 describe('CitiesList component', () => {
   it('should render list of cities', () => {

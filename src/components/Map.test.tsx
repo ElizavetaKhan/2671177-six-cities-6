@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
-import Map from './Map';
+import Map from './map';
 import { City, Point } from '../types/types';
 
 const mockMapInstance = {
