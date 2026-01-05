@@ -2,22 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import useMap from './use-map';
 import { City } from '../types/types';
+import * as leaflet from 'leaflet';
 
-// Mock Leaflet
 const mockMapInstance = {
   setView: vi.fn(),
   addLayer: vi.fn(),
   removeLayer: vi.fn(),
 };
 
-const mockTileLayer = vi.fn();
-const mockMap = vi.fn().mockImplementation(() => mockMapInstance);
-const mockTileLayerConstructor = vi.fn().mockImplementation(() => mockTileLayer);
+vi.mock('leaflet', () => {
+  const mockTileLayer = vi.fn();
+  const mockMap = vi.fn().mockImplementation(() => mockMapInstance);
+  const mockTileLayerConstructor = vi.fn().mockImplementation(() => mockTileLayer);
 
-vi.mock('leaflet', () => ({
-  Map: mockMap,
-  TileLayer: mockTileLayerConstructor,
-}));
+  return {
+    Map: mockMap,
+    TileLayer: mockTileLayerConstructor,
+  };
+});
 
 describe('useMap hook', () => {
   beforeEach(() => {
@@ -30,6 +32,8 @@ describe('useMap hook', () => {
 
     const { result } = renderHook(() => useMap(mapRef, city));
 
+    const mockMap = vi.mocked(leaflet.Map);
+    const mockTileLayerConstructor = vi.mocked(leaflet.TileLayer);
     expect(mockMap).toHaveBeenCalledWith(mapRef.current, {
       center: {
         lat: city.lat,
@@ -60,6 +64,7 @@ describe('useMap hook', () => {
 
     rerender();
 
+    const mockMap = vi.mocked(leaflet.Map);
     expect(mockMap).toHaveBeenCalledTimes(1);
     expect(result.current).toBe(firstMapInstance);
   });
@@ -88,6 +93,7 @@ describe('useMap hook', () => {
 
     renderHook(() => useMap(mapRef, city));
 
+    const mockMap = vi.mocked(leaflet.Map);
     expect(mockMap).toHaveBeenCalledWith(mapRef.current, {
       center: {
         lat: city.lat,

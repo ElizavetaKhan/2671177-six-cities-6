@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -83,7 +83,7 @@ describe('OfferPage component', () => {
     expect(spinner).toBeInTheDocument();
   });
 
-  it('should render offer not found when offer does not exist', () => {
+  it('should render offer not found when offer does not exist', async () => {
     const store = createMockStore({
       offers: { offers: [], isOffersDataLoading: false, offersDataError: null },
     });
@@ -95,7 +95,9 @@ describe('OfferPage component', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Offer not found')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Offer not found')).toBeInTheDocument();
+    });
   });
 });
 

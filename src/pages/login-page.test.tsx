@@ -39,8 +39,8 @@ describe('LoginPage component', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
-    expect(screen.getByLabelText(/E-mail/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sign in/i })).toBeInTheDocument();
   });
 
@@ -55,8 +55,8 @@ describe('LoginPage component', () => {
       </Provider>
     );
 
-    const emailInput = screen.getByLabelText(/E-mail/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
+    const emailInput = screen.getByPlaceholderText('Email');
+    const passwordInput = screen.getByPlaceholderText('Password');
 
     await user.type(emailInput, 'test@example.com');
     await user.type(passwordInput, 'password123');
@@ -76,8 +76,8 @@ describe('LoginPage component', () => {
       </Provider>
     );
 
-    const emailInput = screen.getByLabelText(/E-mail/i);
-    const passwordInput = screen.getByLabelText(/Password/i);
+    const emailInput = screen.getByPlaceholderText('Email');
+    const passwordInput = screen.getByPlaceholderText('Password');
     const submitButton = screen.getByRole('button', { name: /Sign in/i });
 
     await user.type(emailInput, 'test@example.com');

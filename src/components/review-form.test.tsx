@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router-dom';
@@ -31,6 +31,23 @@ const renderWithProviders = (component: JSX.Element) => render(
     </MemoryRouter>
   </Provider>
 );
+
+vi.mock('../store/action', async () => {
+  const actual = await vi.importActual<typeof import('../store/action')>('../store/action');
+  return {
+    ...actual,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+    postReviewAction: vi.fn((_offerId: string, _reviewData: any) =>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      async (_dispatch: any, _getState: any, _api: any) => Promise.resolve()
+    ),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fetchReviewsAction: vi.fn((_offerId: string) =>
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      async (_dispatch: any, _getState: any, _api: any) => Promise.resolve()
+    ),
+  };
+});
 
 describe('ReviewForm component', () => {
   it('should render form with rating and comment fields', () => {
@@ -110,7 +127,9 @@ describe('ReviewForm component', () => {
     const submitButton = screen.getByRole('button', { name: 'Submit' });
     await user.click(submitButton);
 
-    expect(textarea).toHaveValue('');
+    await waitFor(() => {
+      expect(textarea).toHaveValue('');
+    });
     const fiveStarInput = document.getElementById('5-stars') as HTMLInputElement;
     expect(fiveStarInput).not.toBeChecked();
   });
@@ -128,7 +147,9 @@ describe('ReviewForm component', () => {
     await user.click(screen.getByRole('button', { name: 'Submit' }));
 
     // Form should be cleared after submit
-    expect(textarea).toHaveValue('');
+    await waitFor(() => {
+      expect(textarea).toHaveValue('');
+    });
   });
 
   it('should allow selecting different star ratings', async () => {

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import Map from './map';
 import { City, Point } from '../types/types';
+import * as leaflet from 'leaflet';
 
 const mockMapInstance = {
   setView: vi.fn(),
@@ -18,18 +19,20 @@ const mockLayerGroupInstance = {
   addTo: vi.fn().mockReturnThis(),
 };
 
-const mockIcon = vi.fn();
-const mockMarker = vi.fn().mockImplementation(() => mockMarkerInstance);
-const mockLayerGroup = vi.fn().mockImplementation(() => mockLayerGroupInstance);
-const mockIconConstructor = vi.fn().mockImplementation(() => mockIcon);
+vi.mock('leaflet', () => {
+  const mockIcon = vi.fn();
+  const mockMarker = vi.fn().mockImplementation(() => mockMarkerInstance);
+  const mockLayerGroup = vi.fn().mockImplementation(() => mockLayerGroupInstance);
+  const mockIconConstructor = vi.fn().mockImplementation(() => mockIcon);
 
-vi.mock('leaflet', () => ({
-  Map: vi.fn().mockImplementation(() => mockMapInstance),
-  TileLayer: vi.fn(),
-  Marker: mockMarker,
-  layerGroup: mockLayerGroup,
-  Icon: mockIconConstructor,
-}));
+  return {
+    Map: vi.fn().mockImplementation(() => mockMapInstance),
+    TileLayer: vi.fn(),
+    Marker: mockMarker,
+    layerGroup: mockLayerGroup,
+    Icon: mockIconConstructor,
+  };
+});
 
 const mockUseMap = vi.fn();
 vi.mock('../hooks/use-map', () => ({
@@ -63,6 +66,7 @@ describe('Map component', () => {
   it('should create markers for all points', () => {
     render(<Map city={mockCity} points={mockPoints} selectedPoint={undefined} />);
 
+    const mockMarker = vi.mocked(leaflet.Marker);
     expect(mockMarker).toHaveBeenCalledTimes(2);
     expect(mockMarker).toHaveBeenCalledWith({
       lat: mockPoints[0].lat,
@@ -77,6 +81,7 @@ describe('Map component', () => {
   it('should use default icon for points when selectedPoint is undefined', () => {
     render(<Map city={mockCity} points={mockPoints} selectedPoint={undefined} />);
 
+    const mockIconConstructor = vi.mocked(leaflet.Icon);
     expect(mockIconConstructor).toHaveBeenCalled();
     expect(mockMarkerInstance.setIcon).toHaveBeenCalled();
   });
@@ -104,6 +109,7 @@ describe('Map component', () => {
 
     rerender(<Map city={mockCity} points={newPoints} selectedPoint={undefined} />);
 
+    const mockMarker = vi.mocked(leaflet.Marker);
     expect(mockMarker).toHaveBeenCalledWith({
       lat: newPoints[0].lat,
       lng: newPoints[0].lng,
@@ -131,6 +137,7 @@ describe('Map component', () => {
   it('should create layerGroup and add markers to it', () => {
     render(<Map city={mockCity} points={mockPoints} selectedPoint={undefined} />);
 
+    const mockLayerGroup = vi.mocked(leaflet.layerGroup);
     expect(mockLayerGroup).toHaveBeenCalled();
     expect(mockLayerGroupInstance.addTo).toHaveBeenCalledWith(mockMapInstance);
     expect(mockMarkerInstance.addTo).toHaveBeenCalled();
@@ -139,6 +146,7 @@ describe('Map component', () => {
   it('should handle empty points array', () => {
     render(<Map city={mockCity} points={[]} selectedPoint={undefined} />);
 
+    const mockMarker = vi.mocked(leaflet.Marker);
     expect(mockMarker).not.toHaveBeenCalled();
   });
 
@@ -147,6 +155,7 @@ describe('Map component', () => {
 
     render(<Map city={mockCity} points={mockPoints} selectedPoint={undefined} />);
 
+    const mockMarker = vi.mocked(leaflet.Marker);
     expect(mockMarker).not.toHaveBeenCalled();
   });
 });

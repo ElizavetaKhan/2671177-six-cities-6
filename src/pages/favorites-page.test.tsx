@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -74,7 +74,7 @@ describe('FavoritesPage component', () => {
     expect(screen.getAllByAltText('6 cities logo').length).toBeGreaterThan(0);
   });
 
-  it('should render favorite offers', () => {
+  it('should render favorite offers', async () => {
     const store = createMockStore({
       offers: { offers: [mockOffer], isOffersDataLoading: false, offersDataError: null },
     });
@@ -86,7 +86,9 @@ describe('FavoritesPage component', () => {
       </Provider>
     );
 
-    expect(screen.getByText('Test Offer')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Test Offer')).toBeInTheDocument();
+    });
   });
 
   it('should render spinner when loading', () => {
